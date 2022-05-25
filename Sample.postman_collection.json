@@ -1,0 +1,561 @@
+{
+	"info": {
+		"_postman_id": "ec588495-d065-4248-970c-b9bf7c54cace",
+		"name": "Sample",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Success",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let userCredentials = \"530040143:123456\";\r",
+							"let currentTime = new Date().toUTCString();\r",
+							"// Client Details\r",
+							"// let client = 'UojYXMgRD8arRwP6SDGYx9OdZQG6yV4FrT5uAfz';\r",
+							"// let secretKey = 'M1keEUZgAGjeBNHdQldZv3gMjAbVKfBs48Wk5';\r",
+							"// let agent = 'iOS';\r",
+							"// // Client Details\r",
+							"let client = 'i5z90sBOLtMYOfbUsMvMiasHBArZGR8x19RFBaW';\r",
+							"let secretKey = 'A63pLAARP6zQpflp56AAhlF5Tp9jz0FjM7mGe';\r",
+							"let agent = 'android';\r",
+							"let user = encryptUserInfo(userCredentials);\r",
+							"const sdk = require('postman-collection');\r",
+							"const Header = sdk.Header;\r",
+							"pm.request.headers.add(new Header(\"x-stcws-user: \" + user));\r",
+							"// Resolve Request\r",
+							"let newRequest = new sdk.Request(pm.request.toJSON());\r",
+							"let resolvedRequest = newRequest.toObjectResolved(null, [pm.variables.toObject()],{ ignoreOwnVariables: true });\r",
+							"// Get Hash Content\r",
+							"let httpMethod = request.method;\r",
+							"let path = \"/\" + resolvedRequest.url.path.join(\"/\").split(\"/resources/\").pop();\r",
+							"let queryParams = formatQueryParams(resolvedRequest.url.query);\r",
+							"let url = path + queryParams;\r",
+							"let lang = resolvedRequest.url.path[6];\r",
+							"let version = resolvedRequest.url.path[5];\r",
+							"let appVersion = '1.0';\r",
+							"// Prepare Hash Sting\r",
+							"let plainStringtoHash = httpMethod + url + lang + currentTime + agent + version + appVersion + client + httpMethod;\r",
+							"// console.log(plainStringtoHash)\r",
+							"let hash = CryptoJS.HmacSHA256(plainStringtoHash, secretKey).toString(CryptoJS.enc.Base64) + '~' + agent + '~' + appVersion;\r",
+							"// Setting the request headers\r",
+							"pm.request.headers.add(new Header(\"X-STC-API-Key: \" + client));\r",
+							"pm.request.headers.add(new Header(\"EDA-CLIENT: \" + hash));\r",
+							"pm.request.headers.add(new Header(\"EDA-DATE: \" + currentTime));\r",
+							"function encryptUserInfo(userCredentials) {\r",
+							"    const key = CryptoJS.enc.Utf8.parse(getSecretKey());\r",
+							"    const piv = new Date().toISOString().substring(0, 16);\r",
+							"    const iv = CryptoJS.enc.Utf8.parse(piv);\r",
+							"    const miv = piv + userCredentials;\r",
+							"    const msg = CryptoJS.enc.Utf8.parse(miv);\r",
+							"    const encrypted = CryptoJS.AES.encrypt(msg, key, {\r",
+							"      keySize: 128 / 8,\r",
+							"      iv,\r",
+							"      mode: CryptoJS.mode.CBC,\r",
+							"      padding: CryptoJS.pad.Pkcs7\r",
+							"    });\r",
+							"    return 'ENC ' + encrypted;\r",
+							"}\r",
+							"function getSecretKey(){\r",
+							"    let _cs = ['\\x2b\\x4d', '\\x28\\x48', '\\x24\\x42', '\\x33\\x73\\x36', '\\x3f\\x45', '\\x59\\x70', '\\x76\\x39\\x79'];\r",
+							"    return _cs[5] + _cs[3] + _cs[6] + _cs[2] + _cs[4] + _cs[1] + _cs[0];\r",
+							"}\r",
+							"// takes query params as array of { key: x , value: y }\r",
+							"// returns array of ?x=y joined by &\r",
+							"function formatQueryParams(queries){\r",
+							"    if(queries.length > 0){\r",
+							"        formatted = queries.map(query => query.key + \"=\" + query.value);\r",
+							"        return \"?\" + formatted.join(\"&\");\r",
+							"    }else{\r",
+							"        return \"\";\r",
+							"    }\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.be.success;\r",
+							"});\r",
+							"pm.test(\"Ensure `data` property exists and contains `message`\", function () {\r",
+							"    pm.response.to.have.jsonSchema({\r",
+							"        properties: {\r",
+							"            data: {\r",
+							"                type: \"object\",\r",
+							"                properties: {\r",
+							"                    message: {\r",
+							"                        type: \"string\"\r",
+							"                    }\r",
+							"                }\r",
+							"            }\r",
+							"        }\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"value": "2ac066e4fab68d5d7fe73dc2d44aac44=7c9c7801171e84909a82ba4daa55c412; 8b1f5bbafcedfcf5a6ca1d94cd82e0ff=f51a941387cefc95d61fd4ce00cc5f26; b2a299ab078e5f6f27fe9ee7ce37ba89=9805e30d03bd1392b1f98454667cee9d"
+					}
+				],
+				"url": {
+					"raw": "https://sandbox.api.stc.com.sa:9503/a-oscp/customerSelfMgmt/contentMgmt/enterprise/resources/v1/en/public/content/businessStore/brands",
+					"protocol": "https",
+					"host": [
+						"sandbox",
+						"api",
+						"stc",
+						"com",
+						"sa"
+					],
+					"port": "9503",
+					"path": [
+						"a-oscp",
+						"customerSelfMgmt",
+						"contentMgmt",
+						"enterprise",
+						"resources",
+						"v1",
+						"en",
+						"public",
+						"content",
+						"businessStore",
+						"brands"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Server Error",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let userCredentials = \"530040143:123456\";\r",
+							"let currentTime = new Date().toUTCString();\r",
+							"// Client Details\r",
+							"// let client = 'UojYXMgRD8arRwP6SDGYx9OdZQG6yV4FrT5uAfz';\r",
+							"// let secretKey = 'M1keEUZgAGjeBNHdQldZv3gMjAbVKfBs48Wk5';\r",
+							"// let agent = 'iOS';\r",
+							"// // Client Details\r",
+							"let client = 'i5z90sBOLtMYOfbUsMvMiasHBArZGR8x19RFBaW';\r",
+							"let secretKey = 'A63pLAARP6zQpflp56AAhlF5Tp9jz0FjM7mGe';\r",
+							"let agent = 'android';\r",
+							"let user = encryptUserInfo(userCredentials);\r",
+							"const sdk = require('postman-collection');\r",
+							"const Header = sdk.Header;\r",
+							"pm.request.headers.add(new Header(\"x-stcws-user: \" + user));\r",
+							"// Resolve Request\r",
+							"let newRequest = new sdk.Request(pm.request.toJSON());\r",
+							"let resolvedRequest = newRequest.toObjectResolved(null, [pm.variables.toObject()],{ ignoreOwnVariables: true });\r",
+							"// Get Hash Content\r",
+							"let httpMethod = request.method;\r",
+							"let path = \"/\" + resolvedRequest.url.path.join(\"/\").split(\"/resources/\").pop();\r",
+							"let queryParams = formatQueryParams(resolvedRequest.url.query);\r",
+							"let url = path + queryParams;\r",
+							"let lang = resolvedRequest.url.path[6];\r",
+							"let version = resolvedRequest.url.path[5];\r",
+							"let appVersion = '1.0';\r",
+							"// Prepare Hash Sting\r",
+							"let plainStringtoHash = httpMethod + url + lang + currentTime + agent + version + appVersion + client + httpMethod;\r",
+							"// console.log(plainStringtoHash)\r",
+							"let hash = CryptoJS.HmacSHA256(plainStringtoHash, secretKey).toString(CryptoJS.enc.Base64) + '~' + agent + '~' + appVersion;\r",
+							"// Setting the request headers\r",
+							"pm.request.headers.add(new Header(\"X-STC-API-Key: \" + client));\r",
+							"pm.request.headers.add(new Header(\"EDA-CLIENT: \" + hash));\r",
+							"pm.request.headers.add(new Header(\"EDA-DATE: \" + currentTime));\r",
+							"function encryptUserInfo(userCredentials) {\r",
+							"    const key = CryptoJS.enc.Utf8.parse(getSecretKey());\r",
+							"    const piv = new Date().toISOString().substring(0, 16);\r",
+							"    const iv = CryptoJS.enc.Utf8.parse(piv);\r",
+							"    const miv = piv + userCredentials;\r",
+							"    const msg = CryptoJS.enc.Utf8.parse(miv);\r",
+							"    const encrypted = CryptoJS.AES.encrypt(msg, key, {\r",
+							"      keySize: 128 / 8,\r",
+							"      iv,\r",
+							"      mode: CryptoJS.mode.CBC,\r",
+							"      padding: CryptoJS.pad.Pkcs7\r",
+							"    });\r",
+							"    return 'ENC ' + encrypted;\r",
+							"}\r",
+							"function getSecretKey(){\r",
+							"    let _cs = ['\\x2b\\x4d', '\\x28\\x48', '\\x24\\x42', '\\x33\\x73\\x36', '\\x3f\\x45', '\\x59\\x70', '\\x76\\x39\\x79'];\r",
+							"    return _cs[5] + _cs[3] + _cs[6] + _cs[2] + _cs[4] + _cs[1] + _cs[0];\r",
+							"}\r",
+							"// takes query params as array of { key: x , value: y }\r",
+							"// returns array of ?x=y joined by &\r",
+							"function formatQueryParams(queries){\r",
+							"    if(queries.length > 0){\r",
+							"        formatted = queries.map(query => query.key + \"=\" + query.value);\r",
+							"        return \"?\" + formatted.join(\"&\");\r",
+							"    }else{\r",
+							"        return \"\";\r",
+							"    }\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.be.success;\r",
+							"});\r",
+							"pm.test(\"Ensure `data` property exists and contains `message`\", function () {\r",
+							"    pm.response.to.have.jsonSchema({\r",
+							"        properties: {\r",
+							"            data: {\r",
+							"                type: \"object\",\r",
+							"                properties: {\r",
+							"                    message: {\r",
+							"                        type: \"string\"\r",
+							"                    }\r",
+							"                }\r",
+							"            }\r",
+							"        }\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"value": "2ac066e4fab68d5d7fe73dc2d44aac44=7c9c7801171e84909a82ba4daa55c412; 8b1f5bbafcedfcf5a6ca1d94cd82e0ff=f51a941387cefc95d61fd4ce00cc5f26; b2a299ab078e5f6f27fe9ee7ce37ba89=9805e30d03bd1392b1f98454667cee9d"
+					}
+				],
+				"url": {
+					"raw": "https://sandbox.api.stc.com.sa:9503/a-oscp/customerSelfMgmt/contentMgmt/enterprise/resources/v1/en/public/content/businessStore/brands",
+					"protocol": "https",
+					"host": [
+						"sandbox",
+						"api",
+						"stc",
+						"com",
+						"sa"
+					],
+					"port": "9503",
+					"path": [
+						"a-oscp",
+						"customerSelfMgmt",
+						"contentMgmt",
+						"enterprise",
+						"resources",
+						"v1",
+						"en",
+						"public",
+						"content",
+						"businessStore",
+						"brands"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Unauthorized",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let userCredentials = \"530040143:123456\";\r",
+							"let currentTime = new Date().toUTCString();\r",
+							"// Client Details\r",
+							"// let client = 'UojYXMgRD8arRwP6SDGYx9OdZQG6yV4FrT5uAfz';\r",
+							"// let secretKey = 'M1keEUZgAGjeBNHdQldZv3gMjAbVKfBs48Wk5';\r",
+							"// let agent = 'iOS';\r",
+							"// // Client Details\r",
+							"let client = 'i5z90sBOLtMYOfbUsMvMiasHBArZGR8x19RFBaW';\r",
+							"let secretKey = 'A63pLAARP6zQpflp56AAhlF5Tp9jz0FjM7mGe';\r",
+							"let agent = 'android';\r",
+							"let user = encryptUserInfo(userCredentials);\r",
+							"const sdk = require('postman-collection');\r",
+							"const Header = sdk.Header;\r",
+							"pm.request.headers.add(new Header(\"x-stcws-user: \" + user));\r",
+							"// Resolve Request\r",
+							"let newRequest = new sdk.Request(pm.request.toJSON());\r",
+							"let resolvedRequest = newRequest.toObjectResolved(null, [pm.variables.toObject()],{ ignoreOwnVariables: true });\r",
+							"// Get Hash Content\r",
+							"let httpMethod = request.method;\r",
+							"let path = \"/\" + resolvedRequest.url.path.join(\"/\").split(\"/resources/\").pop();\r",
+							"let queryParams = formatQueryParams(resolvedRequest.url.query);\r",
+							"let url = path + queryParams;\r",
+							"let lang = resolvedRequest.url.path[6];\r",
+							"let version = resolvedRequest.url.path[5];\r",
+							"let appVersion = '1.0';\r",
+							"// Prepare Hash Sting\r",
+							"let plainStringtoHash = httpMethod + url + lang + currentTime + agent + version + appVersion + client + httpMethod;\r",
+							"// console.log(plainStringtoHash)\r",
+							"let hash = CryptoJS.HmacSHA256(plainStringtoHash, secretKey).toString(CryptoJS.enc.Base64) + '~' + agent + '~' + appVersion;\r",
+							"// Setting the request headers\r",
+							"pm.request.headers.add(new Header(\"X-STC-API-Key: \" + client));\r",
+							"pm.request.headers.add(new Header(\"EDA-CLIENT: \" + hash));\r",
+							"pm.request.headers.add(new Header(\"EDA-DATE: \" + currentTime));\r",
+							"function encryptUserInfo(userCredentials) {\r",
+							"    const key = CryptoJS.enc.Utf8.parse(getSecretKey());\r",
+							"    const piv = new Date().toISOString().substring(0, 16);\r",
+							"    const iv = CryptoJS.enc.Utf8.parse(piv);\r",
+							"    const miv = piv + userCredentials;\r",
+							"    const msg = CryptoJS.enc.Utf8.parse(miv);\r",
+							"    const encrypted = CryptoJS.AES.encrypt(msg, key, {\r",
+							"      keySize: 128 / 8,\r",
+							"      iv,\r",
+							"      mode: CryptoJS.mode.CBC,\r",
+							"      padding: CryptoJS.pad.Pkcs7\r",
+							"    });\r",
+							"    return 'ENC ' + encrypted;\r",
+							"}\r",
+							"function getSecretKey(){\r",
+							"    let _cs = ['\\x2b\\x4d', '\\x28\\x48', '\\x24\\x42', '\\x33\\x73\\x36', '\\x3f\\x45', '\\x59\\x70', '\\x76\\x39\\x79'];\r",
+							"    return _cs[5] + _cs[3] + _cs[6] + _cs[2] + _cs[4] + _cs[1] + _cs[0];\r",
+							"}\r",
+							"// takes query params as array of { key: x , value: y }\r",
+							"// returns array of ?x=y joined by &\r",
+							"function formatQueryParams(queries){\r",
+							"    if(queries.length > 0){\r",
+							"        formatted = queries.map(query => query.key + \"=\" + query.value);\r",
+							"        return \"?\" + formatted.join(\"&\");\r",
+							"    }else{\r",
+							"        return \"\";\r",
+							"    }\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.be.success;\r",
+							"});\r",
+							"pm.test(\"Ensure `data` property exists and contains `message`\", function () {\r",
+							"    pm.response.to.have.jsonSchema({\r",
+							"        properties: {\r",
+							"            data: {\r",
+							"                type: \"object\",\r",
+							"                properties: {\r",
+							"                    message: {\r",
+							"                        type: \"string\"\r",
+							"                    }\r",
+							"                }\r",
+							"            }\r",
+							"        }\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"value": "2ac066e4fab68d5d7fe73dc2d44aac44=7c9c7801171e84909a82ba4daa55c412; 8b1f5bbafcedfcf5a6ca1d94cd82e0ff=f51a941387cefc95d61fd4ce00cc5f26; b2a299ab078e5f6f27fe9ee7ce37ba89=9805e30d03bd1392b1f98454667cee9d"
+					}
+				],
+				"url": {
+					"raw": "https://sandbox.api.stc.com.sa:9503/a-oscp/customerSelfMgmt/contentMgmt/enterprise/resources/v1/en/public/content/businessStore/brands",
+					"protocol": "https",
+					"host": [
+						"sandbox",
+						"api",
+						"stc",
+						"com",
+						"sa"
+					],
+					"port": "9503",
+					"path": [
+						"a-oscp",
+						"customerSelfMgmt",
+						"contentMgmt",
+						"enterprise",
+						"resources",
+						"v1",
+						"en",
+						"public",
+						"content",
+						"businessStore",
+						"brands"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Too many requests",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let userCredentials = \"530040143:123456\";\r",
+							"let currentTime = new Date().toUTCString();\r",
+							"// Client Details\r",
+							"// let client = 'UojYXMgRD8arRwP6SDGYx9OdZQG6yV4FrT5uAfz';\r",
+							"// let secretKey = 'M1keEUZgAGjeBNHdQldZv3gMjAbVKfBs48Wk5';\r",
+							"// let agent = 'iOS';\r",
+							"// // Client Details\r",
+							"let client = 'i5z90sBOLtMYOfbUsMvMiasHBArZGR8x19RFBaW';\r",
+							"let secretKey = 'A63pLAARP6zQpflp56AAhlF5Tp9jz0FjM7mGe';\r",
+							"let agent = 'android';\r",
+							"let user = encryptUserInfo(userCredentials);\r",
+							"const sdk = require('postman-collection');\r",
+							"const Header = sdk.Header;\r",
+							"pm.request.headers.add(new Header(\"x-stcws-user: \" + user));\r",
+							"// Resolve Request\r",
+							"let newRequest = new sdk.Request(pm.request.toJSON());\r",
+							"let resolvedRequest = newRequest.toObjectResolved(null, [pm.variables.toObject()],{ ignoreOwnVariables: true });\r",
+							"// Get Hash Content\r",
+							"let httpMethod = request.method;\r",
+							"let path = \"/\" + resolvedRequest.url.path.join(\"/\").split(\"/resources/\").pop();\r",
+							"let queryParams = formatQueryParams(resolvedRequest.url.query);\r",
+							"let url = path + queryParams;\r",
+							"let lang = resolvedRequest.url.path[6];\r",
+							"let version = resolvedRequest.url.path[5];\r",
+							"let appVersion = '1.0';\r",
+							"// Prepare Hash Sting\r",
+							"let plainStringtoHash = httpMethod + url + lang + currentTime + agent + version + appVersion + client + httpMethod;\r",
+							"// console.log(plainStringtoHash)\r",
+							"let hash = CryptoJS.HmacSHA256(plainStringtoHash, secretKey).toString(CryptoJS.enc.Base64) + '~' + agent + '~' + appVersion;\r",
+							"// Setting the request headers\r",
+							"pm.request.headers.add(new Header(\"X-STC-API-Key: \" + client));\r",
+							"pm.request.headers.add(new Header(\"EDA-CLIENT: \" + hash));\r",
+							"pm.request.headers.add(new Header(\"EDA-DATE: \" + currentTime));\r",
+							"function encryptUserInfo(userCredentials) {\r",
+							"    const key = CryptoJS.enc.Utf8.parse(getSecretKey());\r",
+							"    const piv = new Date().toISOString().substring(0, 16);\r",
+							"    const iv = CryptoJS.enc.Utf8.parse(piv);\r",
+							"    const miv = piv + userCredentials;\r",
+							"    const msg = CryptoJS.enc.Utf8.parse(miv);\r",
+							"    const encrypted = CryptoJS.AES.encrypt(msg, key, {\r",
+							"      keySize: 128 / 8,\r",
+							"      iv,\r",
+							"      mode: CryptoJS.mode.CBC,\r",
+							"      padding: CryptoJS.pad.Pkcs7\r",
+							"    });\r",
+							"    return 'ENC ' + encrypted;\r",
+							"}\r",
+							"function getSecretKey(){\r",
+							"    let _cs = ['\\x2b\\x4d', '\\x28\\x48', '\\x24\\x42', '\\x33\\x73\\x36', '\\x3f\\x45', '\\x59\\x70', '\\x76\\x39\\x79'];\r",
+							"    return _cs[5] + _cs[3] + _cs[6] + _cs[2] + _cs[4] + _cs[1] + _cs[0];\r",
+							"}\r",
+							"// takes query params as array of { key: x , value: y }\r",
+							"// returns array of ?x=y joined by &\r",
+							"function formatQueryParams(queries){\r",
+							"    if(queries.length > 0){\r",
+							"        formatted = queries.map(query => query.key + \"=\" + query.value);\r",
+							"        return \"?\" + formatted.join(\"&\");\r",
+							"    }else{\r",
+							"        return \"\";\r",
+							"    }\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.be.success;\r",
+							"});\r",
+							"pm.test(\"Ensure `data` property exists and contains `message`\", function () {\r",
+							"    pm.response.to.have.jsonSchema({\r",
+							"        properties: {\r",
+							"            data: {\r",
+							"                type: \"object\",\r",
+							"                properties: {\r",
+							"                    message: {\r",
+							"                        type: \"string\"\r",
+							"                    }\r",
+							"                }\r",
+							"            }\r",
+							"        }\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"value": "2ac066e4fab68d5d7fe73dc2d44aac44=7c9c7801171e84909a82ba4daa55c412; 8b1f5bbafcedfcf5a6ca1d94cd82e0ff=f51a941387cefc95d61fd4ce00cc5f26; b2a299ab078e5f6f27fe9ee7ce37ba89=9805e30d03bd1392b1f98454667cee9d"
+					}
+				],
+				"url": {
+					"raw": "https://sandbox.api.stc.com.sa:9503/a-oscp/customerSelfMgmt/contentMgmt/enterprise/resources/v1/en/public/content/businessStore/brands",
+					"protocol": "https",
+					"host": [
+						"sandbox",
+						"api",
+						"stc",
+						"com",
+						"sa"
+					],
+					"port": "9503",
+					"path": [
+						"a-oscp",
+						"customerSelfMgmt",
+						"contentMgmt",
+						"enterprise",
+						"resources",
+						"v1",
+						"en",
+						"public",
+						"content",
+						"businessStore",
+						"brands"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
